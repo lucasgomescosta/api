@@ -1,0 +1,713 @@
+{
+	"info": {
+		"_postman_id": "18b0c46a-4a41-4caf-b9a8-892a271bd6f8",
+		"name": "Curso Spring Boot",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "5013723",
+		"_collection_link": "https://crimson-zodiac-374516.postman.co/workspace/Curso-de-Java-com-Spring-Boot~1f71e66f-f364-4e2c-beed-cf402a2a35e6/collection/5013723-18b0c46a-4a41-4caf-b9a8-892a271bd6f8?action=share&source=collection_link&creator=5013723"
+	},
+	"item": [
+		{
+			"name": "Autenticação",
+			"item": [
+				{
+					"name": "Gerar Token do ADMIN do Keycloak",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Tenta parsear o body como JSON\r",
+									"let jsonData = {};\r",
+									"try {\r",
+									"    jsonData = pm.response.json();\r",
+									"} catch (e) {\r",
+									"    pm.test(\"Resposta não está em formato JSON\", function () {\r",
+									"        throw new Error(\"Response is not JSON: \" + e.message);\r",
+									"    });\r",
+									"}\r",
+									"\r",
+									"if (jsonData.access_token) {\r",
+									"    pm.collectionVariables.set(\"keycloakAccessToken\", jsonData.access_token);\r",
+									"    pm.collectionVariables.set(\"keycloakRefreshToken\", jsonData.refresh_token);\r",
+									"    console.log(\"Access token armazenado.\");\r",
+									"} else {\r",
+									"    pm.test(\"Token de acesso não encontrado\", function () {\r",
+									"        throw new Error(\"access_token não encontrado no corpo da resposta.\");\r",
+									"    });\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/x-www-form-urlencoded"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "client_id",
+									"value": "admin-cli",
+									"type": "text"
+								},
+								{
+									"key": "username",
+									"value": "{{keycloakAdminUsername}}",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "{{keycloakAdminPassword}}",
+									"type": "text"
+								},
+								{
+									"key": "grant_type",
+									"value": "password",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:8080/realms/master/protocol/openid-connect/token",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"realms",
+								"master",
+								"protocol",
+								"openid-connect",
+								"token"
+							]
+						},
+						"description": "Generated from cURL: curl -X POST \"http://localhost:8080/realms/master/protocol/openid-connect/token\" \\\r\n  -H \"Content-Type: application/x-www-form-urlencoded\" \\\r\n  -d \"client_id=admin-cli\" \\\r\n  -d \"username=admin\" \\\r\n  -d \"password=admin\" \\\r\n  -d \"grant_type=password\"\r\n"
+					},
+					"response": []
+				},
+				{
+					"name": "Gerar um Token para logar usuário",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Tenta parsear o body como JSON\r",
+									"let jsonData = {};\r",
+									"try {\r",
+									"    jsonData = pm.response.json();\r",
+									"} catch (e) {\r",
+									"    pm.test(\"Resposta não está em formato JSON\", function () {\r",
+									"        throw new Error(\"Response is not JSON: \" + e.message);\r",
+									"    });\r",
+									"}\r",
+									"\r",
+									"if (jsonData.access_token) {\r",
+									"    pm.collectionVariables.set(\"userAccessToken\", jsonData.access_token);\r",
+									"    pm.collectionVariables.set(\"userRefreshToken\", jsonData.refresh_token);\r",
+									"    console.log(\"Access token armazenado.\");\r",
+									"} else {\r",
+									"    pm.test(\"Token de acesso não encontrado\", function () {\r",
+									"        throw new Error(\"access_token não encontrado no corpo da resposta.\");\r",
+									"    });\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/x-www-form-urlencoded"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "client_id",
+									"value": "spring-api",
+									"type": "text"
+								},
+								{
+									"key": "grant_type",
+									"value": "password",
+									"type": "text"
+								},
+								{
+									"key": "username",
+									"value": "marcos.maciel@email.com",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "123456",
+									"type": "text"
+								},
+								{
+									"key": "client_secret",
+									"value": "ClGKw7YyHuvQpmzlKjIBOivC8R4fwk75",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:8080/realms/agenda-tarefas/protocol/openid-connect/token",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"realms",
+								"agenda-tarefas",
+								"protocol",
+								"openid-connect",
+								"token"
+							]
+						},
+						"description": "Generated from cURL: curl -X POST \"http://localhost:8080/realms/meureino/protocol/openid-connect/token\" \\\r\n  -H \"Content-Type: application/x-www-form-urlencoded\" \\\r\n  -d \"client_id=spring-api\" \\\r\n  -d \"grant_type=password\" \\\r\n  -d \"username=joao\" \\\r\n  -d \"password=123456\"\r\n"
+					},
+					"response": []
+				},
+				{
+					"name": "Atualiza token de usuário com Refresh Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Tenta parsear o body como JSON\r",
+									"let jsonData = {};\r",
+									"try {\r",
+									"    jsonData = pm.response.json();\r",
+									"} catch (e) {\r",
+									"    pm.test(\"Resposta não está em formato JSON\", function () {\r",
+									"        throw new Error(\"Response is not JSON: \" + e.message);\r",
+									"    });\r",
+									"}\r",
+									"\r",
+									"if (jsonData.access_token) {\r",
+									"    pm.collectionVariables.set(\"userAccessToken\", jsonData.access_token);\r",
+									"    pm.collectionVariables.set(\"userRefreshToken\", jsonData.refresh_token);\r",
+									"    console.log(\"Access token armazenado.\");\r",
+									"} else {\r",
+									"    pm.test(\"Token de acesso não encontrado\", function () {\r",
+									"        throw new Error(\"access_token não encontrado no corpo da resposta.\");\r",
+									"    });\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/x-www-form-urlencoded"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "grant_type",
+									"value": "refresh_token",
+									"type": "text"
+								},
+								{
+									"key": "client_id",
+									"value": "spring-api",
+									"type": "text"
+								},
+								{
+									"key": "client_secret",
+									"value": "{{userPassword}}",
+									"type": "text"
+								},
+								{
+									"key": "refresh_token",
+									"value": "{{userRefreshToken}}",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:8080/realms/agenda-tarefas/protocol/openid-connect/token",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"realms",
+								"agenda-tarefas",
+								"protocol",
+								"openid-connect",
+								"token"
+							]
+						},
+						"description": "Generated from cURL: curl -X POST \"http://localhost:8080/realms/master/protocol/openid-connect/token\" \\\r\n  -H \"Content-Type: application/x-www-form-urlencoded\" \\\r\n  -d \"grant_type=refresh_token\" \\\r\n  -d \"client_id=meu-client\" \\\r\n  -d \"client_secret=meu-secreto\" \\\r\n  -d \"refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\" \r\n"
+					},
+					"response": []
+				},
+				{
+					"name": "Atualiza token do ADMIN do Keycloak com o refresh token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Tenta parsear o body como JSON\r",
+									"let jsonData = {};\r",
+									"try {\r",
+									"    jsonData = pm.response.json();\r",
+									"} catch (e) {\r",
+									"    pm.test(\"Resposta não está em formato JSON\", function () {\r",
+									"        throw new Error(\"Response is not JSON: \" + e.message);\r",
+									"    });\r",
+									"}\r",
+									"\r",
+									"if (jsonData.access_token) {\r",
+									"    pm.collectionVariables.set(\"keycloakAccessToken\", jsonData.access_token);\r",
+									"    pm.collectionVariables.set(\"keycloakRefreshToken\", jsonData.refresh_token);\r",
+									"    console.log(\"Access token armazenado.\");\r",
+									"} else {\r",
+									"    pm.test(\"Token de acesso não encontrado\", function () {\r",
+									"        throw new Error(\"access_token não encontrado no corpo da resposta.\");\r",
+									"    });\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/x-www-form-urlencoded"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "grant_type",
+									"value": "refresh_token",
+									"type": "text"
+								},
+								{
+									"key": "client_id",
+									"value": "admin-cli",
+									"type": "text"
+								},
+								{
+									"key": "client_secret",
+									"value": "{{keycloakAdminPassword}}",
+									"type": "text"
+								},
+								{
+									"key": "refresh_token",
+									"value": "{{keycloakRefreshToken}}",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:8080/realms/master/protocol/openid-connect/token",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"realms",
+								"master",
+								"protocol",
+								"openid-connect",
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reset Password Usuário",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{keycloakAccessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"type\": \"password\",\r\n    \"value\": \"123456\",\r\n    \"temporary\": false\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/admin/realms/agenda-tarefas/users/{{userCreatedId}}/reset-password",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"admin",
+								"realms",
+								"agenda-tarefas",
+								"users",
+								"{{userCreatedId}}",
+								"reset-password"
+							]
+						},
+						"description": "Generated from cURL: curl -X PUT \"http://localhost:8080/admin/realms/meureino/users/{userId}/reset-password\" \\\r\n  -H \"Content-Type: application/json\" \\\r\n  -H \"Authorization: Bearer {SEU_TOKEN}\" \\\r\n  -d '{\r\n    \"type\": \"password\",\r\n    \"value\": \"123456\",\r\n    \"temporary\": false\r\n}'\r\n"
+					},
+					"response": []
+				},
+				{
+					"name": "Cria um novo usuário no Keycloak",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Captura o cabeçalho 'Location'\r",
+									"const locationHeader = pm.response.headers.get(\"Location\");\r",
+									"\r",
+									"if (locationHeader) {\r",
+									"    // Extrai o ID (UUID) do final da URL\r",
+									"    const userIdMatch = locationHeader.match(/\\/users\\/([a-f0-9\\-]+)$/);\r",
+									"    if (userIdMatch && userIdMatch[1]) {\r",
+									"        const userId = userIdMatch[1];\r",
+									"        // Salva na variável da collection\r",
+									"        pm.collectionVariables.set(\"userCreatedId\", userId);\r",
+									"        console.log(\"ID do usuário salvo:\", userId);\r",
+									"    } else {\r",
+									"        console.warn(\"ID do usuário não encontrado no Location header.\");\r",
+									"    }\r",
+									"} else {\r",
+									"    console.warn(\"Cabeçalho 'Location' não encontrado na resposta.\");\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{keycloakAccessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"username\": \"jonas\",\r\n  \"enabled\": true,\r\n  \"emailVerified\": true,\r\n  \"email\": \"jonas@email.com\",\r\n  \"firstName\": \"Jonas\",\r\n  \"lastName\": \"Silva\",\r\n  \"requiredActions\": [\"UPDATE_PASSWORD\"]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/admin/realms/agenda-tarefas/users",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"admin",
+								"realms",
+								"agenda-tarefas",
+								"users"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Tarefas",
+			"item": [
+				{
+					"name": "Criar tarefas",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{userAccessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"titulo\": \"Reunião de alinhamento\",\n    \"descricao\": \"Reunião para alinharmos os detalhes do curso de desenvolvimento backend\",\n    \"local\": \"São Paulo\",\n    \"dataHora\": \"2025-05-28T19:30:00\",\n    \"criador\": {\n        \"id\": 1,\n        \"nome\": \"Marcos Maciel\",\n        \"email\": \"marcosmaciel@email.com\",\n        \"telefone\": \"11999988888\"\n    },\n    \"convidados\": [\n        {\n            \"nome\": \"Ana Beatriz Costa\",\n            \"email\": \"ana.costa@email.com\"\n        },\n        {\n            \"nome\": \"Hugo Augusto\",\n            \"email\": \"hugo.augusto@email.com\"\n        },\n        {\n            \"nome\": \"Josue Salamanco\",\n            \"email\": \"josue.salamanco@email.com\"\n        },\n        {\n            \"nome\": \"Peronio Jose\",\n            \"email\": \"Peronio.jose@email.com\"\n        }\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8081/tarefas",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"tarefas"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Consulta Tarefas",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{userAccessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "localhost:8081/tarefas/1",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"tarefas",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Usuários",
+			"item": [
+				{
+					"name": "Cadastra Usuários",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{userAccessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "",
+								"value": "",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": " {\r\n    \"nome\": \"Fernanda Alves\",\r\n    \"email\": \"fernanda.alves@email.com\",\r\n    \"telefone\": \"21998887766\"\r\n  }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8081/usuarios",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"usuarios"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Consulta de Usuários",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{userAccessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "",
+								"value": "",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8081/usuarios",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"usuarios"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "userAccessToken",
+			"value": "",
+			"type": "default"
+		},
+		{
+			"key": "userRefreshToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "userPassword",
+			"value": "123456",
+			"type": "string"
+		},
+		{
+			"key": "username",
+			"value": "marcos",
+			"type": "string"
+		},
+		{
+			"key": "keycloakAdminPassword",
+			"value": "",
+			"type": "default"
+		},
+		{
+			"key": "keycloakRefreshToken",
+			"value": "",
+			"type": "default"
+		},
+		{
+			"key": "keycloakAdminUsername",
+			"value": "admin",
+			"type": "default"
+		},
+		{
+			"key": "keycloakAccessToken",
+			"value": ""
+		},
+		{
+			"key": "userCreatedId",
+			"value": ""
+		}
+	]
+}
