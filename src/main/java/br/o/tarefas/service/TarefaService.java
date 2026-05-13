@@ -2,6 +2,7 @@ package br.o.tarefas.service;
 
 import br.o.tarefas.dto.TarefaDTO;
 import br.o.tarefas.entidade.Convidado;
+import br.o.tarefas.entidade.ConvidadoPendente;
 import br.o.tarefas.entidade.Tarefa;
 import br.o.tarefas.entidade.Usuario;
 import br.o.tarefas.exceptions.RestExceptions;
@@ -9,9 +10,13 @@ import br.o.tarefas.repository.TarefaRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,15 +40,61 @@ public class TarefaService {
 
         Tarefa tarefa = modelMapper.map(tarefaDTO, Tarefa.class);
 
+        TarefaDTO tarefaDto = atribuirConvidadosValidos(tarefaDTO, tarefa);
 
+        if (!tarefaDto.getConvidadosPendentes().isEmpty()) {
+            List<Mono<Integer>> usuariosMono = tarefa.getConvidadoPendente().stream()
+                    .filter(c -> c.getKeycloackId() == null || c.getKeycloackId().isBlank())
+                    .map(usuarioService::keycloackCriarNovoUsuario)
+                    .toList();
+
+            Integer usuariosCriados = Flux.merge(usuariosMono)
+                    .reduce(0, Integer::sum)
+                    .block();
+
+            System.out.println("Total de usuários criados no Keycloak: " + usuariosCriados);
+
+        }
+
+        return tarefaDto;
+    }
+
+    private TarefaDTO atribuirConvidadosValidos(TarefaDTO tarefaDTO, Tarefa tarefa) {
         List<Usuario> usuariosConvidados = usuarioService.validaConvidadoExistente(tarefaDTO.getConvidados());
         List<Convidado> convidados = usuariosConvidados.stream()
                         .map(usuario -> new Convidado(tarefa, usuario))
                 .collect(Collectors.toList());
-
         tarefa.setConvidados(convidados);
+        atribuiConvidadosPendentes(tarefaDTO, tarefa);
+
         Tarefa tarefaSalva = tarefaRepository.save(tarefa);
         return modelMapper.map(tarefaSalva, TarefaDTO.class);
+    }
+
+    private void atribuiConvidadosPendentes(TarefaDTO tarefaDTO,  Tarefa tarefaEntity) {
+        List<String> emailsConvidadosExistentes = tarefaEntity.getConvidados().stream()
+                .map(convidado -> convidado.getUsuario().getEmail())
+                .toList();
+
+
+        List<ConvidadoPendente> convidadoPendentes = tarefaDTO.getConvidados().stream()
+                .filter(dto -> !emailsConvidadosExistentes.contains(dto.getEmail()))
+                .map(dto -> new ConvidadoPendente(tarefaEntity, dto.getNome(), dto.getEmail()))
+                .toList();
+
+        List<ConvidadoPendente> usuarioKeycloakPendente = usuarioService.buscaUsuariosPendentesNoKeycloak(convidadoPendentes);
+
+        Map<String, ConvidadoPendente> mapUsuarioKeycloak = usuarioKeycloakPendente.stream()
+                        .collect(Collectors.toMap(ConvidadoPendente::getConvidadoEmail, Function.identity()));
+
+        convidadoPendentes.forEach(convidado -> {
+            ConvidadoPendente keycloakPendente = mapUsuarioKeycloak.get(convidado.getConvidadoEmail());
+            if (keycloakPendente != null) {
+                convidado.setKeycloackId(keycloakPendente.getKeycloackId());
+            }
+        });
+
+        tarefaEntity.setConvidadoPendente(convidadoPendentes);
     }
 
     /**
@@ -139,15 +190,7 @@ public class TarefaService {
             if (tarefaDTO.getDataHora() != null) {
                 tarefaExistente.setDataHora(tarefaDTO.getDataHora());
             }
-            List<Usuario> usuariosConvidados = usuarioService.validaConvidadoExistente(tarefaDTO.getConvidados());
-            List<Convidado> convidados = usuariosConvidados.stream()
-                    .map(usuario -> new Convidado(tarefaExistente, usuario))
-                    .collect(Collectors.toList());
-
-            tarefaExistente.setConvidados(convidados);
-
-            Tarefa tarefaAtualizada = tarefaRepository.save(tarefaExistente);
-            return modelMapper.map(tarefaAtualizada, TarefaDTO.class);
+        return atribuirConvidadosValidos(tarefaDTO, tarefaExistente);
 
     }
 

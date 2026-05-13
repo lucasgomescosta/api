@@ -1,0 +1,23 @@
+package br.o.tarefas.repository;
+
+import br.o.tarefas.entidade.ConvidadoPendente;
+import jakarta.transaction.Transactional;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import java.util.List;
+
+public interface ConvidadoPendenteRepository extends JpaRepository<ConvidadoPendente, Long> {
+
+    @Modifying
+    @Transactional
+    @Query(value = "UPDATE convidado_pendente c SET c.keycloak_id = :keycloakId WHERE c.convidado_email = :email", nativeQuery = true)
+    int updateKeycloakIdByEmail(@Param("keycloakId") String keycloakId, @Param("email") String email);
+
+    List<ConvidadoPendente> findByKeycloackId(String userId);
+
+    @Query(value = "select * from convidado_pendente c where c.convidado_email = :email and c.keycloak_id is not null limit 1", nativeQuery = true)
+    List<ConvidadoPendente> findConvidadosPendentesKeycloak(@Param("email") String email);
+}

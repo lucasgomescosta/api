@@ -449,7 +449,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"username\": \"jonas\",\r\n  \"enabled\": true,\r\n  \"emailVerified\": true,\r\n  \"email\": \"jonas@email.com\",\r\n  \"firstName\": \"Jonas\",\r\n  \"lastName\": \"Silva\",\r\n  \"requiredActions\": [\"UPDATE_PASSWORD\"]\r\n}",
+							"raw": "{\r\n  \"username\": \"fernanda\",\r\n  \"enabled\": true,\r\n  \"emailVerified\": true,\r\n  \"email\": \"fernanda@email.com\",\r\n  \"firstName\": \"Fernanda\",\r\n  \"lastName\": \"Ribeiro\",\r\n  \"requiredActions\": [\"UPDATE_PASSWORD\"]\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -468,6 +468,96 @@
 								"realms",
 								"agenda-tarefas",
 								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Associar usuário ao grupo",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{keycloakAccessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer <seu-token>"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"realm\": \"agenda-tarefas\"\r\n  }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/admin/realms/agenda-tarefas/users/{{userCreatedId}}/groups/aaa8db35-1458-4426-840c-27c3715a0a7a",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"admin",
+								"realms",
+								"agenda-tarefas",
+								"users",
+								"{{userCreatedId}}",
+								"groups",
+								"aaa8db35-1458-4426-840c-27c3715a0a7a"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Consulta de Grupos",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{keycloakAccessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer <seu-token>"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/admin/realms/agenda-tarefas/groups",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"admin",
+								"realms",
+								"agenda-tarefas",
+								"groups"
 							]
 						}
 					},
@@ -500,7 +590,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"titulo\": \"Reunião de alinhamento\",\n    \"descricao\": \"Reunião para alinharmos os detalhes do curso de desenvolvimento backend\",\n    \"local\": \"São Paulo\",\n    \"dataHora\": \"2025-05-28T19:30:00\",\n    \"criador\": {\n        \"id\": 1,\n        \"nome\": \"Marcos Maciel\",\n        \"email\": \"marcosmaciel@email.com\",\n        \"telefone\": \"11999988888\"\n    },\n    \"convidados\": [\n        {\n            \"nome\": \"Ana Beatriz Costa\",\n            \"email\": \"ana.costa@email.com\"\n        },\n        {\n            \"nome\": \"Hugo Augusto\",\n            \"email\": \"hugo.augusto@email.com\"\n        },\n        {\n            \"nome\": \"Josue Salamanco\",\n            \"email\": \"josue.salamanco@email.com\"\n        },\n        {\n            \"nome\": \"Peronio Jose\",\n            \"email\": \"Peronio.jose@email.com\"\n        }\n    ]\n}",
+							"raw": "{\n    \"titulo\": \"Reunião de alinhamento\",\n    \"descricao\": \"Reunião para alinharmos os detalhes do curso de desenvolvimento backend\",\n    \"local\": \"São Paulo\",\n    \"dataHora\": \"2025-06-10T19:30:00\",\n    \"criador\": {\n        \"id\": 1,\n        \"nome\": \"Marcos Maciel\",\n        \"email\": \"marcosmaciel@email.com\",\n        \"telefone\": \"11999988888\"\n    },\n    \"convidados\": [\n        {\n            \"nome\": \"Bruna Martins Alves\",\n            \"email\": \"bruna.alves@email.com\"\n        },\n        {\n            \"nome\": \"Lucas Pereira Lima\",\n            \"email\": \"lucas.lima@email.com\"\n        },\n        {\n            \"nome\": \"Tainá Figueiredo\",\n            \"email\": \"taina.figueiredo@email.com\"\n        },\n        {\n            \"nome\": \"Eduardo Camargo\",\n            \"email\": \"eduardo.camargo@email.com\"\n        }\n    ]\n}",
 							"options": {
 								"raw": {
 									"language": "json"

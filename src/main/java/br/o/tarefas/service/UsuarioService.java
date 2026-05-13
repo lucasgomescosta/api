@@ -4,32 +4,40 @@ import br.o.tarefas.dto.ConvidadoDTO;
 import br.o.tarefas.dto.TarefaDTO;
 import br.o.tarefas.dto.UsuarioDTO;
 import br.o.tarefas.entidade.Convidado;
+import br.o.tarefas.entidade.ConvidadoPendente;
 import br.o.tarefas.entidade.Usuario;
 import br.o.tarefas.exceptions.RestExceptions;
+import br.o.tarefas.repository.ConvidadoPendenteRepository;
 import br.o.tarefas.repository.ConvidadoRepository;
 import br.o.tarefas.repository.UsuarioRepository;
+import br.o.tarefas.service.request.KeycloakUserRequest;
+import br.o.tarefas.service.request.ResetPasswordRequest;
+import br.o.tarefas.util.PasswordGenerateUtil;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 
 @Service
+@RequiredArgsConstructor
 public class UsuarioService {
 
-    @Autowired
-    private UsuarioRepository usuarioRepository;
+    private final UsuarioRepository usuarioRepository;
 
-    @Autowired
-    private ConvidadoRepository convidadoRepository;
+    private final ConvidadoRepository convidadoRepository;
 
-    @Autowired
-    private ModelMapper modelMapper;
+    private final ModelMapper modelMapper;
+
+    private final KeycloakUserClientService keycloakUserClientService;
+
+    private final ConvidadoPendenteRepository convidadoPendenteRepository;
 
 
 
@@ -47,6 +55,39 @@ public class UsuarioService {
         user.setTelefone(usuarioDTO.getTelefone());
 
         return modelMapper.map(usuarioRepository.save(user), UsuarioDTO.class);
+    }
+
+    public Mono<Integer> keycloackCriarNovoUsuario(ConvidadoPendente usuarioConvidadoPendente) {
+        KeycloakUserRequest keycloakUserRequest = getKeycloakUserRequest(usuarioConvidadoPendente);
+        String senhaAleatoria = PasswordGenerateUtil.generate(10);
+        System.out.println("Senha: " + senhaAleatoria);
+
+        ResetPasswordRequest resetPasswordRequest = new ResetPasswordRequest("password", senhaAleatoria, true);
+
+        return keycloakUserClientService.createUser(keycloakUserRequest)
+                .flatMap(userId -> keycloakUserClientService.resetPassword(userId, resetPasswordRequest)
+                        .then(Mono.fromCallable(() ->
+                                convidadoPendenteRepository.updateKeycloakIdByEmail(userId, usuarioConvidadoPendente.getConvidadoEmail())
+                        ))
+                );
+    }
+
+    private KeycloakUserRequest getKeycloakUserRequest(ConvidadoPendente usuarioConvidadoPendente) {
+        KeycloakUserRequest keycloakUserRequest = new KeycloakUserRequest();
+        keycloakUserRequest.setUserName(usuarioConvidadoPendente.getConvidadoEmail());
+        keycloakUserRequest.setEmail(usuarioConvidadoPendente.getConvidadoEmail());
+        keycloakUserRequest.setEmailVerified(true);
+        keycloakUserRequest.setEnabled(true);
+        keycloakUserRequest.setFirstName(usuarioConvidadoPendente.getConvidadoNome().split(" ")[0]);
+        keycloakUserRequest.setLastName(usuarioConvidadoPendente.getConvidadoNome().split(" ")[1]);
+        keycloakUserRequest.setRequiredActions(List.of("UPDATE_PASSWORD"));
+        return keycloakUserRequest;
+    }
+
+    public List<ConvidadoPendente> buscaUsuariosPendentesNoKeycloak(List<ConvidadoPendente> convidadoPendentes) {
+        return convidadoPendentes.stream()
+                .flatMap(convidado -> convidadoPendenteRepository.findConvidadosPendentesKeycloak(convidado.getConvidadoEmail()).stream())
+                .collect(Collectors.toList());
     }
 
     public List<Usuario> validaConvidadoExistente(List<ConvidadoDTO> convidados) {
@@ -69,6 +110,13 @@ public class UsuarioService {
 
         return convites.stream()
                 .map(convidado -> modelMapper.map(convidado.getTarefa(), TarefaDTO.class))
+                .collect(Collectors.toList());
+    }
+
+    public List<UsuarioDTO> recuperarUsuarios() {
+        return usuarioRepository.findAll()
+                .stream()
+                .map(usuario -> modelMapper.map(usuario, UsuarioDTO.class))
                 .collect(Collectors.toList());
     }
 }

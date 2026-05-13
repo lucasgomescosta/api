@@ -40,6 +40,8 @@ public class TarefaDTO {
     @NotNull(message = "Nenhum convidado foi selecionado")
     private List<ConvidadoDTO> convidados;
 
+    private List<ConvidadoPendenteDTO> convidadosPendentes;
+
     @NotNull
     private UsuarioDTO criador;
 
